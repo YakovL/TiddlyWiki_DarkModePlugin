@@ -49,7 +49,7 @@ config.macros.switchNightMode = {
         var dayPalette = store.fetchTiddler(this.dayPaletteTitle)
         store.deleteTiddler(this.dayPaletteTitle)
         if(dayPalette.text === "shadow")
-            store.removeTiddler(paletteTitle); // to recalc slices of ColorPalette
+            store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
         else {
             store.saveTiddler(paletteTitle, paletteTitle, dayPaletteText)
         }
@@ -71,20 +71,20 @@ config.macros.switchNightMode = {
     },
     switchMode: function() {
 
-        if(config.options.chkNightMode)
-            config.macros.switchNightMode.goDay();
-        else
-            config.macros.switchNightMode.goNight();
+        config.options.chkNightMode = !config.options.chkNightMode
 
-        config.options.chkNightMode = !config.options.chkNightMode;
+        if(config.options.chkNightMode)
+            config.macros.switchNightMode.goNight()
+        else
+            config.macros.switchNightMode.goDay()
 
 // "baking" doesn't work yet..
         if(saveOption)
-            saveOption("chkNightMode");
+            saveOption("chkNightMode")
         else
-            saveOptionCookie("chkNightMode");
+            saveOptionCookie("chkNightMode")
 
-        refreshColorPalette();
+        refreshColorPalette()
     },
     init: function() {
         this.adjustCss()
@@ -92,10 +92,11 @@ config.macros.switchNightMode = {
     },
     handler: function(place, macroName, params, wikifier, paramString, tiddler) {
 
-        var pParams = paramString.parseParams("anon", null, true, false, true),
-            label = getParam(pParams, "label", "switch")
+		var pParams = paramString.parseParams("anon", null, true, false, true)
+		var label = getParam(pParams, "label", "switch")
+		var tooltip = ""
 
-        createTiddlyButton(place, label, ""/*tooltip*/, this.switchMode);
+		createTiddlyButton(place, label, tooltip, this.switchMode)
     }
 };
 
