@@ -2,7 +2,7 @@
 |''Name''|NightModePlugin|
 |''Description''|This plugin introduces the {{{switchNightMode}}} macro that allows to switch "day mode" and "night mode" styles|
 |''Version''|0.11.1|
-|''~CoreVersion''||
+|''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Syntax
 {{{
