@@ -1,7 +1,7 @@
 /***
 |''Name''|NightModePlugin|
 |''Description''|This plugin introduces "night mode" (changes styles) and switching it by the {{{switchNightMode}}} macro and operating system settings|
-|''Version''|0.12.0|
+|''Version''|0.12.1|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Syntax
@@ -15,11 +15,13 @@
 !!!Code
 ***/
 //{{{
-var applySectionCSS = function(section) {
-    var text = store.getRecursiveTiddlerText("NightModePlugin##" + section, "", 1)
-    text = text.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
-    return setStylesheet(text, section)
-};
+var pluginName = "NightModePlugin"
+
+var applySectionCSS = function(sectionName) {
+    var sectionText = store.getRecursiveTiddlerText(pluginName + "##" + sectionName, "", 1)
+    var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
+    return setStylesheet(css, sectionName)
+}
 
 // when a browser doesn't support detection, returns falsy
 var isOsInDarkMode = function() {
@@ -27,7 +29,7 @@ var isOsInDarkMode = function() {
 }
 
 config.macros.switchNightMode = {
-    nightCPText: store.getTiddlerText("NightModePlugin##NightModeColorPalette"),
+    nightCPText: store.getTiddlerText(pluginName + "##NightModeColorPalette"),
     // this helper may be more complex for custom theme
     getMainPaletteTitle: function() {
         return "ColorPalette"
