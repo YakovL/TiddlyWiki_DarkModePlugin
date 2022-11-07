@@ -17,7 +17,7 @@
 //{{{
 var applySectionCSS = function(section) {
     var text = store.getRecursiveTiddlerText("NightModePlugin##" + section, "", 1)
-    text = text.substring(3, text.length - 3)
+    text = text.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
     return setStylesheet(text, section)
 };
 
