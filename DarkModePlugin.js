@@ -6,10 +6,12 @@
 |''Author''|Yakov Litvin|
 !!!Syntax
 {{{
-<<switchNightMode label:"try this">>
+<<switchNightMode>>
+<<switchNightMode label:"☀️/🌘">>
 }}}
 !!!Demo
-<<switchNightMode label:"try this">>
+<<switchNightMode>>
+<<switchNightMode label:"☀️/🌘">>
 !!!Code
 ***/
 //{{{
