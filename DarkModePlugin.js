@@ -1,7 +1,7 @@
 /***
 |''Name''|NightModePlugin|
-|''Description''|This plugin introduces the {{{switchNightMode}}} macro that allows to switch "day mode" and "night mode" styles|
-|''Version''|0.11.2|
+|''Description''|This plugin introduces "night mode" (changes styles) and switching it by the {{{switchNightMode}}} macro and operating system settings|
+|''Version''|0.12.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Syntax
@@ -18,6 +18,11 @@ var applySectionCSS = function(section) {
     text = text.substring(3, text.length - 3)
     return setStylesheet(text, section)
 };
+
+// when a browser doesn't support detection, returns falsy
+var isOsInDarkMode = function() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+}
 
 config.macros.switchNightMode = {
     nightCPText: store.getTiddlerText("NightModePlugin##NightModeColorPalette"),
@@ -98,10 +103,6 @@ config.macros.switchNightMode = {
 
         createTiddlyButton(place, label, tooltip, this.switchMode)
     }
-};
-
-function isOsInDarkMode() {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
 // apply night mode if it was set previously
@@ -110,6 +111,15 @@ if(isOsInDarkMode())
     config.options.chkNightMode = true
 if(config.options.chkNightMode)
     config.macros.switchNightMode.goNight()
+
+// detect OS mode change, apply
+if(window.matchMedia) {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
+        var macro = config.macros.switchNightMode
+        var shouldGoDark = !!event.matches
+        if(shouldGoDark !== macro.isNight()) macro.switchMode()
+    })
+}
 //}}}
 /***
 !!!TextBoxColors
