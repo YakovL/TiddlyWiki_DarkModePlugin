@@ -35,8 +35,8 @@ config.macros.switchNightMode = {
         return "ColorPalette"
     },
     dayPaletteTitle: "ColorPaletteDay",
-    goNight: function() { // doesn't check or change the cookie-parameter
-
+    // goNight, goDay, and adjustCss are "governed outside": they don't check or change the cookie-parameter
+    goNight: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
         var dayPaletteTiddler = new Tiddler(this.dayPaletteTitle)
@@ -49,10 +49,9 @@ config.macros.switchNightMode = {
         // attach the tiddler, recalc slices, invoke notifiers
         store.saveTiddler(nigthPaletteTiddler)
 
-        this.adjustCss()
+        this.adjustCss(true)
     },
-    goDay: function() { // doesn't check or change the cookie-parameter
-
+    goDay: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
         var dayPalette = store.fetchTiddler(this.dayPaletteTitle)
@@ -63,13 +62,9 @@ config.macros.switchNightMode = {
             store.saveTiddler(paletteTitle, paletteTitle, dayPalette.text)
         }
 
-        this.adjustCss()
+        this.adjustCss(false)
     },
-    isNight: function() {
-        return !!store.fetchTiddler(this.dayPaletteTitle)
-    },
-    adjustCss: function() {
-        var isNightMode = this.isNight()
+    adjustCss: function(isNightMode) {
         if(isNightMode) {
             applySectionCSS("TextBoxColors")
             applySectionCSS("~FewerColors")
@@ -78,8 +73,12 @@ config.macros.switchNightMode = {
             removeStyleSheet("~FewerColors")
         }
     },
-    switchMode: function() {
 
+    // "governance" methods
+    isNight: function() {
+        return !!store.fetchTiddler(this.dayPaletteTitle)
+    },
+    switchMode: function() {
         config.options.chkNightMode = !config.options.chkNightMode
 
         if(config.options.chkNightMode)
@@ -96,11 +95,11 @@ config.macros.switchNightMode = {
         refreshColorPalette()
     },
     init: function() {
-        this.adjustCss()
+        var isNightMode = this.isNight()
+        this.adjustCss(isNightMode)
         config.options.chkNightMode = this.isNight()
     },
     handler: function(place, macroName, params, wikifier, paramString, tiddler) {
-
         var pParams = paramString.parseParams("anon", null, true, false, true)
         var label = getParam(pParams, "label", "switch")
         var tooltip = ""
