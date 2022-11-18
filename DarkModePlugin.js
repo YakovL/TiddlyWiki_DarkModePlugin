@@ -1,23 +1,25 @@
 /***
-|''Name''|NightModePlugin|
-|''Description''|This plugin introduces "night mode" (changes styles) and switching it by the {{{switchNightMode}}} macro and operating system settings|
-|''Version''|0.12.1|
+|''Name''|DarkModePlugin|
+|''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
+|''Version''|1.0.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Syntax
 {{{
-<<switchNightMode>>
-<<switchNightMode label:"☀️/🌘">>
+<<darkMode>>
+<<switchNightMode>> (backward compatibility)
+<<darkMode label:"☀️/🌘">>
 }}}
 !!!Demo
-<<switchNightMode>>
-<<switchNightMode label:"☀️/🌘">>
+<<darkMode>>
+<<switchNightMode>> (backward compatibility)
+<<darkMode label:"☀️/🌘">>
+!!!Additional notes
+The palette applied for the dark mode can be customized by editing ColorPaletteDark (removing it restores the default values).
 !!!Code
 ***/
 //{{{
-var pluginName = "NightModePlugin"
-
-var applySectionCSS = function(sectionName) {
+var applySectionCSS = function(pluginName, sectionName) {
     var sectionText = store.getRecursiveTiddlerText(pluginName + "##" + sectionName, "", 1)
     var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
     return setStylesheet(css, sectionName)
@@ -28,34 +30,41 @@ var isOsInDarkMode = function() {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
 }
 
-config.macros.switchNightMode = {
-    nightCPText: store.getTiddlerText(pluginName + "##NightModeColorPalette"),
-    // this helper may be more complex for custom theme
+config.macros.switchNightMode = // backward compatibility
+config.macros.darkMode = {
+    pluginName: "DarkModePlugin",
+    optionName: "chkDarkMode",
+    getDarkPaletteText: function() {
+        return store.getTiddlerText(this.darkPaletteTitle)
+    },
+    // this helper may become more complex for custom themes
     getMainPaletteTitle: function() {
         return "ColorPalette"
     },
-    dayPaletteTitle: "ColorPaletteDay",
-    // goNight, goDay, and adjustCss are "governed outside": they don't check or change the cookie-parameter
-    goNight: function() {
+    lightPaletteTitle: "ColorPaletteLight",
+    darkPaletteTitle: "ColorPaletteDark",
+
+    // setDark, setLight, and adjustCss are "governed outside": they don't check or change the cookie-parameter
+    setDark: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
-        var dayPaletteTiddler = new Tiddler(this.dayPaletteTitle)
+        var dayPaletteTiddler = new Tiddler(this.lightPaletteTitle)
         var paletteTiddler = store.fetchTiddler(paletteTitle)
         dayPaletteTiddler.text = paletteTiddler ? paletteTiddler.text : "shadow"
         store.saveTiddler(dayPaletteTiddler)
 
         var nigthPaletteTiddler = new Tiddler(paletteTitle)
-        nigthPaletteTiddler.text = this.nightCPText
+        nigthPaletteTiddler.text = this.getDarkPaletteText()
         // attach the tiddler, recalc slices, invoke notifiers
         store.saveTiddler(nigthPaletteTiddler)
 
         this.adjustCss(true)
     },
-    goDay: function() {
+    setLight: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
-        var dayPalette = store.fetchTiddler(this.dayPaletteTitle)
-        store.deleteTiddler(this.dayPaletteTitle)
+        var dayPalette = store.fetchTiddler(this.lightPaletteTitle)
+        store.deleteTiddler(this.lightPaletteTitle)
         if(dayPalette.text === "shadow")
             store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
         else {
@@ -64,10 +73,10 @@ config.macros.switchNightMode = {
 
         this.adjustCss(false)
     },
-    adjustCss: function(isNightMode) {
-        if(isNightMode) {
-            applySectionCSS("TextBoxColors")
-            applySectionCSS("~FewerColors")
+    adjustCss: function(isDarkMode) {
+        if(isDarkMode) {
+            applySectionCSS(this.pluginName, "TextBoxColors")
+            applySectionCSS(this.pluginName, "~FewerColors")
         } else {
             removeStyleSheet("TextBoxColors")
             removeStyleSheet("~FewerColors")
@@ -75,29 +84,39 @@ config.macros.switchNightMode = {
     },
 
     // "governance" methods
-    isNight: function() {
-        return !!store.fetchTiddler(this.dayPaletteTitle)
+    isDarkMode: function() {
+        return !!store.fetchTiddler(this.lightPaletteTitle)
     },
     switchMode: function() {
-        config.options.chkNightMode = !config.options.chkNightMode
+        var me = config.macros.darkMode
+        config.options[me.optionName] = !config.options[me.optionName]
 
-        if(config.options.chkNightMode)
-            config.macros.switchNightMode.goNight()
-        else
-            config.macros.switchNightMode.goDay()
+        config.options[me.optionName] ? me.setDark() : me.setLight()
 
 // "baking" doesn't work yet..
         if(saveOption)
-            saveOption("chkNightMode")
+            saveOption(me.optionName)
         else
-            saveOptionCookie("chkNightMode")
+            saveOptionCookie(me.optionName)
 
         refreshColorPalette()
     },
     init: function() {
-        var isNightMode = this.isNight()
-        this.adjustCss(isNightMode)
-        config.options.chkNightMode = this.isNight()
+        var me = config.macros.darkMode
+        config.shadowTiddlers[me.darkPaletteTitle] = store.getTiddlerText(me.pluginName + "##DarkModeColorPalette")
+
+        var isDarkMode = me.isDarkMode()
+        me.adjustCss(isDarkMode)
+        config.options[me.optionName] = isDarkMode
+
+        // detect OS mode change, apply
+        if(window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',
+            function(event) {
+                var shouldSetDark = !!event.matches
+                if(shouldSetDark !== me.isDarkMode()) me.switchMode()
+            })
+        }
     },
     handler: function(place, macroName, params, wikifier, paramString, tiddler) {
         var pParams = paramString.parseParams("anon", null, true, false, true)
@@ -108,21 +127,12 @@ config.macros.switchNightMode = {
     }
 }
 
-// apply night mode if it was set previously
+// apply dark mode if it was set previously
 // (.init method of the macro shouldn't be used as it is invoked too late and would require refreshing)
 if(isOsInDarkMode())
-    config.options.chkNightMode = true
-if(config.options.chkNightMode)
-    config.macros.switchNightMode.goNight()
-
-// detect OS mode change, apply
-if(window.matchMedia) {
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
-        var macro = config.macros.switchNightMode
-        var shouldGoDark = !!event.matches
-        if(shouldGoDark !== macro.isNight()) macro.switchMode()
-    })
-}
+    config.options[this.optionName] = true
+if(config.options[this.optionName])
+    config.macros.darkMode.setDark()
 //}}}
 /***
 !!!TextBoxColors
@@ -135,7 +145,7 @@ textarea { color:[[ColorPalette::Foreground]]; background-color:[[ColorPalette::
 .title, h1, h2, h3, h4, h5, h6
     { color:[[ColorPalette::PrimaryDark]]; }
 }}}
-!!!NightModeColorPalette
+!!!DarkModeColorPalette
 Background: #000
 Foreground: #fff
 ~PrimaryPale: #730
