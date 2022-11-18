@@ -1,7 +1,7 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.0.0|
+|''Version''|1.0.1|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Syntax
@@ -73,10 +73,15 @@ config.macros.darkMode = {
 
         this.adjustCss(false)
     },
+    applySectionCSS: function(sectionName) {
+        var sectionText = store.getRecursiveTiddlerText(this.pluginName + "##" + sectionName, "", 1)
+        var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
+        return setStylesheet(css, sectionName)
+    },
     adjustCss: function(isDarkMode) {
         if(isDarkMode) {
-            applySectionCSS(this.pluginName, "TextBoxColors")
-            applySectionCSS(this.pluginName, "~FewerColors")
+            this.applySectionCSS("TextBoxColors")
+            this.applySectionCSS("~FewerColors")
         } else {
             removeStyleSheet("TextBoxColors")
             removeStyleSheet("~FewerColors")
