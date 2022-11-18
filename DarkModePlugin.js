@@ -17,12 +17,6 @@ The palette applied for the dark mode can be customized by editing ColorPaletteD
 !!!Code
 ***/
 //{{{
-var applySectionCSS = function(pluginName, sectionName) {
-    var sectionText = store.getRecursiveTiddlerText(pluginName + "##" + sectionName, "", 1)
-    var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
-    return setStylesheet(css, sectionName)
-}
-
 // when a browser doesn't support detection, returns falsy
 var isOsInDarkMode = function() {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
