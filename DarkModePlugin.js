@@ -4,16 +4,14 @@
 |''Version''|1.0.1|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
-!!!Syntax
-{{{
-<<darkMode>>
-<<switchNightMode>> (backward compatibility)
-<<darkMode label:"☀️/🌘">>
-}}}
 !!!Demo
 <<darkMode>>
-<<switchNightMode>> (backward compatibility)
 <<darkMode label:"☀️/🌘">>
+!!!Syntax
+{{{
+<<darkMode>> (<<switchNightMode>> also works, for backward compatibility)
+<<darkMode label:"☀️/🌘">>
+}}}
 !!!Additional notes
 The palette applied for the dark mode can be customized by editing ColorPaletteDark (removing it restores the default values).
 !!!Code
