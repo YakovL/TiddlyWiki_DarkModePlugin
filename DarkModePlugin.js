@@ -125,23 +125,23 @@ config.macros.darkMode = {
 
 // We avoid using .init to support installation via SharedTiddlersPlugin, TiddlerInFilePlugin, and reinstalling via CookTiddlerPlugin.
 // This also helps to avoid extra refreshing.
-var dmMacro = config.macros.darkMode
+;(function(macro) {
+    // Save the palette as shadow so that one can cusomize it
+    config.shadowTiddlers[macro.darkPaletteTitle] =
+        store.getTiddlerText(macro.pluginName + "##DarkModeColorPalette")
 
-// Save the palette as shadow so that one can cusomize it
-config.shadowTiddlers[dmMacro.darkPaletteTitle] =
-    store.getTiddlerText(dmMacro.pluginName + "##DarkModeColorPalette")
+    // Set dark mode on start if OS dark mode is set or dark mode was saved previously
+    macro.followOsMode(false)
+    macro.restoreSavedMode()
 
-// Set dark mode on start if OS dark mode is set or dark mode was saved previously
-dmMacro.followOsMode(false)
-dmMacro.restoreSavedMode()
-
-// Detect OS mode change, apply (install only once)
-if(window.matchMedia && !dmMacro.isOsModeWatcherSet) {
-    dmMacro.isOsModeWatcherSet = true
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
-        dmMacro.followOsMode(true)
-    })
-}
+    // Detect OS mode change, apply (install only once)
+    if(window.matchMedia && !macro.isOsModeWatcherSet) {
+        macro.isOsModeWatcherSet = true
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
+            macro.followOsMode(true)
+        })
+    }
+})(config.macros.darkMode)
 //}}}
 /***
 !!!TextBoxColors
