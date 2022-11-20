@@ -1,7 +1,7 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.0.1|
+|''Version''|1.1.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Author''|Yakov Litvin|
 !!!Demo
@@ -17,11 +17,6 @@ The palette applied for the dark mode can be customized by editing ColorPaletteD
 !!!Code
 ***/
 //{{{
-// when a browser doesn't support detection, returns falsy
-var isOsInDarkMode = function() {
-    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
-}
-
 config.macros.switchNightMode = // backward compatibility
 config.macros.darkMode = {
     pluginName: "DarkModePlugin",
@@ -97,22 +92,27 @@ config.macros.darkMode = {
 
         refreshColorPalette()
     },
-    init: function() {
-        var me = config.macros.darkMode
-        config.shadowTiddlers[me.darkPaletteTitle] = store.getTiddlerText(me.pluginName + "##DarkModeColorPalette")
+    followOsMode: function(followLight) {
+        // old browsers may fail to detect
+        var isOsDarkModeDetected = window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: dark)').matches
 
-        var isDarkMode = me.isDarkMode()
-        me.adjustCss(isDarkMode)
-        config.options[me.optionName] = isDarkMode
-
-        // detect OS mode change, apply
-        if(window.matchMedia) {
-            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',
-            function(event) {
-                var shouldSetDark = !!event.matches
-                if(shouldSetDark !== me.isDarkMode()) me.switchMode()
-            })
+        if(isOsDarkModeDetected && !this.isDarkMode()) {
+            config.options[this.optionName] = false
+            this.switchMode()
         }
+
+        if(!isOsDarkModeDetected && this.isDarkMode() && followLight) {
+            config.options[this.optionName] = true
+            this.switchMode()
+        }
+    },
+    restoreSavedMode: function() {
+		if(!this.isDarkMode()) return
+
+		// TODO: check if styles are really missing (avoid applying twice)
+		macro.adjustCss(true)
+		config.options[macro.optionName] = true
     },
     handler: function(place, macroName, params, wikifier, paramString, tiddler) {
         var pParams = paramString.parseParams("anon", null, true, false, true)
@@ -123,12 +123,25 @@ config.macros.darkMode = {
     }
 }
 
-// apply dark mode if it was set previously
-// (.init method of the macro shouldn't be used as it is invoked too late and would require refreshing)
-if(isOsInDarkMode())
-    config.options[this.optionName] = true
-if(config.options[this.optionName])
-    config.macros.darkMode.setDark()
+// We avoid using .init to support installation via SharedTiddlersPlugin, TiddlerInFilePlugin, and reinstalling via CookTiddlerPlugin.
+// This also helps to avoid extra refreshing.
+var macro = config.macros.darkMode
+
+// Save the palette as shadow so that one can cusomize it
+config.shadowTiddlers[macro.darkPaletteTitle] =
+    store.getTiddlerText(macro.pluginName + "##DarkModeColorPalette")
+
+// Set dark mode on start if OS dark mode is set or dark mode was saved previously
+macro.followOsMode(false)
+macro.restoreSavedMode()
+
+// Detect OS mode change, apply (install only once)
+if(window.matchMedia && !macro.isOsModeWatcherSet) {
+    macro.isOsModeWatcherSet = true
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
+        macro.followOsMode(true)
+    })
+}
 //}}}
 /***
 !!!TextBoxColors
