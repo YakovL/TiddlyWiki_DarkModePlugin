@@ -40,10 +40,9 @@ config.macros.darkMode = {
     setDark: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
-        var dayPaletteTiddler = new Tiddler(this.lightPaletteTitle)
-        var paletteTiddler = store.fetchTiddler(paletteTitle)
-        dayPaletteTiddler.text = paletteTiddler ? paletteTiddler.text : "shadow"
-        store.saveTiddler(dayPaletteTiddler)
+        var lightPaletteTiddler = new Tiddler(this.lightPaletteTitle)
+        lightPaletteTiddler.text = store.getTiddlerText(paletteTitle) || "shadow"
+        store.saveTiddler(lightPaletteTiddler)
 
         var nigthPaletteTiddler = new Tiddler(paletteTitle)
         nigthPaletteTiddler.text = this.getDarkPaletteText()
@@ -55,12 +54,12 @@ config.macros.darkMode = {
     setLight: function() {
         var paletteTitle = this.getMainPaletteTitle()
 
-        var dayPalette = store.fetchTiddler(this.lightPaletteTitle)
+        var lightPaletteText = store.getTiddlerText(this.lightPaletteTitle)
         store.deleteTiddler(this.lightPaletteTitle)
-        if(dayPalette.text === "shadow")
+        if(!lightPaletteText || lightPaletteText === "shadow")
             store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
         else {
-            store.saveTiddler(paletteTitle, paletteTitle, dayPalette.text)
+            store.saveTiddler(paletteTitle, paletteTitle, lightPaletteText)
         }
 
         this.adjustCss(false)
