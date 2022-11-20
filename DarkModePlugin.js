@@ -111,8 +111,8 @@ config.macros.darkMode = {
 		if(!this.isDarkMode()) return
 
 		// TODO: check if styles are really missing (avoid applying twice)
-		macro.adjustCss(true)
-		config.options[macro.optionName] = true
+		this.adjustCss(true)
+		config.options[this.optionName] = true
     },
     handler: function(place, macroName, params, wikifier, paramString, tiddler) {
         var pParams = paramString.parseParams("anon", null, true, false, true)
