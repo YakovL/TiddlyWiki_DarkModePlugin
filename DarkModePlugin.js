@@ -50,12 +50,12 @@ config.macros.darkMode = {
         var paletteTitle = this.getMainPaletteTitle()
 
         var lightPaletteText = store.getTiddlerText(this.lightPaletteTitle)
-        store.deleteTiddler(this.lightPaletteTitle)
         if(!lightPaletteText || lightPaletteText === "shadow")
             store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
         else {
             store.saveTiddler(paletteTitle, paletteTitle, lightPaletteText)
         }
+        store.deleteTiddler(this.lightPaletteTitle)
 
         this.adjustCss(false)
     },
