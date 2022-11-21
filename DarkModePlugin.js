@@ -39,10 +39,10 @@ config.macros.darkMode = {
         lightPaletteTiddler.text = store.getTiddlerText(paletteTitle) || "shadow"
         store.saveTiddler(lightPaletteTiddler)
 
-        var nigthPaletteTiddler = new Tiddler(paletteTitle)
-        nigthPaletteTiddler.text = this.getDarkPaletteText()
+        var darkPaletteTiddler = new Tiddler(paletteTitle)
+        darkPaletteTiddler.text = this.getDarkPaletteText()
         // attach the tiddler, recalc slices, invoke notifiers
-        store.saveTiddler(nigthPaletteTiddler)
+        store.saveTiddler(darkPaletteTiddler)
 
         this.adjustCss(true)
     },
