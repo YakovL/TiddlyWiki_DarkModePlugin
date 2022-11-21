@@ -527,7 +527,7 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="TiddlerInFilePlugin" modifier="Yakov Litvin" created="202211110931" modified="202211180729" tags="systemConfig" changecount="4">
+<div title="TiddlerInFilePlugin" modifier="Yakov Litvin" created="202211110931" modified="202211220813" tags="systemConfig" changecount="6">
 <pre>/***
 |Description|Allows to store any number of tiddlers as external files and more|
 |Version|1.1.1'|
@@ -674,8 +674,23 @@ config.macros.external = {
 //		var tiddlerText = loadFile(getLocalPath(getFullPath(meta.fileName)));
 //		onExternalTiddlerLoad(tiddlerText !== null, meta, tiddlerText);
 		// so we use async instead:
+		const callback = this.onExternalTiddlerLoad
 		const path = getFullPath(meta.fileName, meta.tiddlerName, this.getExtension(meta));
-		httpReq(&quot;GET&quot;, path, this.onExternalTiddlerLoad, meta);
+		// httpReq(&quot;GET&quot;, path, this.onExternalTiddlerLoad, meta) uses default dataType,
+		// which causes js to get evaluated on load. To avoid this, we customize the ajax call:
+		jQuery.ajax({
+			type: &quot;GET&quot;,
+			url: path,
+			dataType: &quot;text&quot;,
+			processData: false,
+			cache: false,
+			complete: function(xhr, textStatus) {
+				if((!xhr.status &amp;&amp; location.protocol === &quot;file:&quot;) || (xhr.status &gt;= 200 &amp;&amp; xhr.status &lt; 300) || xhr.status === 304)
+					callback(true, meta, xhr.responseText, path, xhr)
+				else
+					callback(false, meta, null, path, xhr)
+			}
+		})
 		//# rename onExternalTiddlerLoad into internalizeAndRegister?
 	},
 	onExternalTiddlerLoad: function(success, meta, responseText) {
