@@ -15,6 +15,10 @@
 }}}
 !!!Additional notes
 The palette applied for the dark mode can be customized by editing ColorPaletteDark (removing it restores the default values).
+
+The plugin adds extra styles (see ~TextBoxColors and ~FewerColors sections) which are not yet configurable.
+
+The option {{{chkDarkMode}}} is now deprecated: later it will be either removed or re-implemented.
 !!!Code
 ***/
 //{{{
