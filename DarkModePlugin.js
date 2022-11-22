@@ -3,6 +3,7 @@
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
 |''Version''|1.1.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
+|''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
 !!!Demo
 <<darkMode>>
