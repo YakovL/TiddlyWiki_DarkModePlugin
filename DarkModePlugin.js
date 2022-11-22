@@ -24,128 +24,128 @@ The option {{{chkDarkMode}}} is now deprecated: later it will be either removed 
 //{{{
 config.macros.switchNightMode = // backward compatibility
 config.macros.darkMode = {
-    pluginName: "DarkModePlugin",
-    optionName: "chkDarkMode",
-    getDarkPaletteText: function() {
-        return store.getTiddlerText(this.darkPaletteTitle)
-    },
-    // this helper may become more complex for custom themes
-    getMainPaletteTitle: function() {
-        return "ColorPalette"
-    },
-    lightPaletteTitle: "ColorPaletteLight",
-    darkPaletteTitle: "ColorPaletteDark",
+	pluginName: "DarkModePlugin",
+	optionName: "chkDarkMode",
+	getDarkPaletteText: function() {
+		return store.getTiddlerText(this.darkPaletteTitle)
+	},
+	// this helper may become more complex for custom themes
+	getMainPaletteTitle: function() {
+		return "ColorPalette"
+	},
+	lightPaletteTitle: "ColorPaletteLight",
+	darkPaletteTitle: "ColorPaletteDark",
 
-    // setDark, setLight, and adjustCss are "governed outside": they don't check or change the cookie-parameter
-    setDark: function() {
-        var paletteTitle = this.getMainPaletteTitle()
+	// setDark, setLight, and adjustCss are "governed outside": they don't check or change the cookie-parameter
+	setDark: function() {
+		var paletteTitle = this.getMainPaletteTitle()
 
-        var lightPaletteTiddler = new Tiddler(this.lightPaletteTitle)
-        lightPaletteTiddler.text = store.getTiddlerText(paletteTitle) || "shadow"
-        store.saveTiddler(lightPaletteTiddler)
+		var lightPaletteTiddler = new Tiddler(this.lightPaletteTitle)
+		lightPaletteTiddler.text = store.getTiddlerText(paletteTitle) || "shadow"
+		store.saveTiddler(lightPaletteTiddler)
 
-        var darkPaletteTiddler = new Tiddler(paletteTitle)
-        darkPaletteTiddler.text = this.getDarkPaletteText()
-        // attach the tiddler, recalc slices, invoke notifiers
-        store.saveTiddler(darkPaletteTiddler)
+		var darkPaletteTiddler = new Tiddler(paletteTitle)
+		darkPaletteTiddler.text = this.getDarkPaletteText()
+		// attach the tiddler, recalc slices, invoke notifiers
+		store.saveTiddler(darkPaletteTiddler)
 
-        this.adjustCss(true)
-    },
-    setLight: function() {
-        var paletteTitle = this.getMainPaletteTitle()
+		this.adjustCss(true)
+	},
+	setLight: function() {
+		var paletteTitle = this.getMainPaletteTitle()
 
-        var lightPaletteText = store.getTiddlerText(this.lightPaletteTitle)
-        if(!lightPaletteText || lightPaletteText === "shadow")
-            store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
-        else {
-            store.saveTiddler(paletteTitle, paletteTitle, lightPaletteText)
-        }
-        store.deleteTiddler(this.lightPaletteTitle)
+		var lightPaletteText = store.getTiddlerText(this.lightPaletteTitle)
+		if(!lightPaletteText || lightPaletteText === "shadow")
+			store.removeTiddler(paletteTitle) // to recalc slices of ColorPalette
+		else
+			store.saveTiddler(paletteTitle, paletteTitle, lightPaletteText)
 
-        this.adjustCss(false)
-    },
-    applySectionCSS: function(sectionName) {
-        var sectionText = store.getRecursiveTiddlerText(this.pluginName + "##" + sectionName, "", 1)
-        var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
-        return setStylesheet(css, sectionName)
-    },
-    adjustCss: function(isDarkMode) {
-        if(isDarkMode) {
-            this.applySectionCSS("TextBoxColors")
-            this.applySectionCSS("~FewerColors")
-        } else {
-            removeStyleSheet("TextBoxColors")
-            removeStyleSheet("~FewerColors")
-        }
-    },
+		store.deleteTiddler(this.lightPaletteTitle)
 
-    // "governance" methods
-    isDarkMode: function() {
-        return !!store.fetchTiddler(this.lightPaletteTitle)
-    },
-    switchMode: function() {
-        var me = config.macros.darkMode
-        config.options[me.optionName] = !config.options[me.optionName]
+		this.adjustCss(false)
+	},
+	applySectionCSS: function(sectionName) {
+		var sectionText = store.getRecursiveTiddlerText(this.pluginName + "##" + sectionName, "", 1)
+		var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
+		return setStylesheet(css, sectionName)
+	},
+	adjustCss: function(isDarkMode) {
+		if(isDarkMode) {
+			this.applySectionCSS("TextBoxColors")
+			this.applySectionCSS("~FewerColors")
+		} else {
+			removeStyleSheet("TextBoxColors")
+			removeStyleSheet("~FewerColors")
+		}
+	},
 
-        config.options[me.optionName] ? me.setDark() : me.setLight()
+	// "governance" methods
+	isDarkMode: function() {
+		return !!store.fetchTiddler(this.lightPaletteTitle)
+	},
+	switchMode: function() {
+		var me = config.macros.darkMode
+		config.options[me.optionName] = !config.options[me.optionName]
+
+		config.options[me.optionName] ? me.setDark() : me.setLight()
 
 // "baking" doesn't work yet..
-        if(saveOption)
-            saveOption(me.optionName)
-        else
-            saveOptionCookie(me.optionName)
+		if(saveOption)
+			saveOption(me.optionName)
+		else
+			saveOptionCookie(me.optionName)
 
-        refreshColorPalette()
-    },
-    followOsMode: function(followLight) {
-        // old browsers may fail to detect
-        var isOsDarkModeDetected = window.matchMedia &&
-            window.matchMedia('(prefers-color-scheme: dark)').matches
+		refreshColorPalette()
+	},
+	followOsMode: function(followLight) {
+		// old browsers may fail to detect
+		var isOsDarkModeDetected = window.matchMedia &&
+			window.matchMedia('(prefers-color-scheme: dark)').matches
 
-        if(isOsDarkModeDetected && !this.isDarkMode()) {
-            config.options[this.optionName] = false
-            this.switchMode()
-        }
+		if(isOsDarkModeDetected && !this.isDarkMode()) {
+			config.options[this.optionName] = false
+			this.switchMode()
+		}
 
-        if(!isOsDarkModeDetected && this.isDarkMode() && followLight) {
-            config.options[this.optionName] = true
-            this.switchMode()
-        }
-    },
-    restoreSavedMode: function() {
+		if(!isOsDarkModeDetected && this.isDarkMode() && followLight) {
+			config.options[this.optionName] = true
+			this.switchMode()
+		}
+	},
+	restoreSavedMode: function() {
 		if(!this.isDarkMode()) return
 
 		// TODO: check if styles are really missing (avoid applying twice)
 		this.adjustCss(true)
 		config.options[this.optionName] = true
-    },
-    handler: function(place, macroName, params, wikifier, paramString, tiddler) {
-        var pParams = paramString.parseParams("anon", null, true, false, true)
-        var label = getParam(pParams, "label", "switch")
-        var tooltip = ""
+	},
+	handler: function(place, macroName, params, wikifier, paramString, tiddler) {
+		var pParams = paramString.parseParams("anon", null, true, false, true)
+		var label = getParam(pParams, "label", "switch")
+		var tooltip = ""
 
-        createTiddlyButton(place, label, tooltip, this.switchMode)
-    }
+		createTiddlyButton(place, label, tooltip, this.switchMode)
+	}
 }
 
 // We avoid using .init to support installation via SharedTiddlersPlugin, TiddlerInFilePlugin, and reinstalling via CookTiddlerPlugin.
 // This also helps to avoid extra refreshing.
 ;(function(macro) {
-    // Save the palette as shadow so that one can cusomize it
-    config.shadowTiddlers[macro.darkPaletteTitle] =
-        store.getTiddlerText(macro.pluginName + "##DarkModeColorPalette")
+	// Save the palette as shadow so that one can cusomize it
+	config.shadowTiddlers[macro.darkPaletteTitle] =
+		store.getTiddlerText(macro.pluginName + "##DarkModeColorPalette")
 
-    // Set dark mode on start if OS dark mode is set or dark mode was saved previously
-    macro.followOsMode(false)
-    macro.restoreSavedMode()
+	// Set dark mode on start if OS dark mode is set or dark mode was saved previously
+	macro.followOsMode(false)
+	macro.restoreSavedMode()
 
-    // Detect OS mode change, apply (install only once)
-    if(window.matchMedia && !macro.isOsModeWatcherSet) {
-        macro.isOsModeWatcherSet = true
-        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
-            macro.followOsMode(true)
-        })
-    }
+	// Detect OS mode change, apply (install only once)
+	if(window.matchMedia && !macro.isOsModeWatcherSet) {
+	macro.isOsModeWatcherSet = true
+		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
+			macro.followOsMode(true)
+		})
+	}
 })(config.macros.darkMode)
 //}}}
 /***
@@ -157,7 +157,7 @@ textarea { color:[[ColorPalette::Foreground]]; background-color:[[ColorPalette::
 !!!~FewerColors
 {{{
 .title, h1, h2, h3, h4, h5, h6
-    { color:[[ColorPalette::PrimaryDark]]; }
+	{ color:[[ColorPalette::PrimaryDark]]; }
 }}}
 !!!DarkModeColorPalette
 Background: #000
