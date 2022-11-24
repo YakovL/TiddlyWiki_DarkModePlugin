@@ -1,7 +1,7 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.1.0|
+|''Version''|1.2.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
@@ -13,12 +13,23 @@
 <<darkMode>> (<<switchNightMode>> also works, for backward compatibility)
 <<darkMode label:"☀️/🌘">>
 }}}
+!!!Installation
+Is as usual: import or copy the plugin with the {{{systemConfig}}} tag, reload. Note: for the plugin to work correctly, you should keep its name (DarkModePlugin).
+
+!!!Optional configuration
+When the dark mode is applied, the {{{darkMode}}} class is added to the {{{body}}} element. This allows to add ''styles for dark mode'' only, like this:
+{{{
+.darkMode code { color:red }
+code { color: green }
+}}}
+Ordinary styles are applied to both modes, but {{{.darkMode}}} ones have higher precedence and "overwrite" the oridinary ones.
+
+The palette applied for the dark mode can be ''customized'' by editing ColorPaletteDark (removing it restores the default values).
+
 !!!Additional notes
-The palette applied for the dark mode can be customized by editing ColorPaletteDark (removing it restores the default values).
+The plugin ''adds extra styles'' (see ~TextBoxColors and ~FewerColors sections) which are not yet configurable.
 
-The plugin adds extra styles (see ~TextBoxColors and ~FewerColors sections) which are not yet configurable.
-
-The option {{{chkDarkMode}}} is now deprecated: later it will be either removed or re-implemented.
+The option {{{chkDarkMode}}} is now ''deprecated'': later it will be either removed or re-implemented.
 !!!Code
 ***/
 //{{{
@@ -49,6 +60,7 @@ config.macros.darkMode = {
 		// attach the tiddler, recalc slices, invoke notifiers
 		store.saveTiddler(darkPaletteTiddler)
 
+		jQuery('body').addClass('darkMode')
 		this.adjustCss(true)
 	},
 	setLight: function() {
@@ -62,6 +74,7 @@ config.macros.darkMode = {
 
 		store.deleteTiddler(this.lightPaletteTitle)
 
+		jQuery('body').removeClass('darkMode')
 		this.adjustCss(false)
 	},
 	applySectionCSS: function(sectionName) {
@@ -141,7 +154,7 @@ config.macros.darkMode = {
 
 	// Detect OS mode change, apply (install only once)
 	if(window.matchMedia && !macro.isOsModeWatcherSet) {
-	macro.isOsModeWatcherSet = true
+		macro.isOsModeWatcherSet = true
 		window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(event) {
 			macro.followOsMode(true)
 		})
