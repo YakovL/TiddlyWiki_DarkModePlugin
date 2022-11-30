@@ -1,7 +1,7 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.2.0|
+|''Version''|1.2.1|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
@@ -169,8 +169,12 @@ textarea { color:[[ColorPalette::Foreground]]; background-color:[[ColorPalette::
 }}}
 !!!~FewerColors
 {{{
-.title, h1, h2, h3, h4, h5, h6
-	{ color:[[ColorPalette::PrimaryDark]]; }
+.title, h1, h2, h3, h4, h5, h6 {
+	color: [[ColorPalette::PrimaryDark]];
+}
+::selection {
+	background: [[ColorPalette::TertiaryLight]];
+}
 }}}
 !!!DarkModeColorPalette
 Background: #000
