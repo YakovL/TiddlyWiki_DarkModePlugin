@@ -1,7 +1,7 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.2.1|
+|''Version''|1.3.0|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
@@ -29,7 +29,7 @@ The palette applied for the dark mode can be ''customized'' by editing ColorPale
 !!!Additional notes
 Styles of some browser interface bits (like <html><button class="button" onclick='alert("this is known as an alert")'>alert</button</html> are only affected by OS/browser's "dark mode"/theme, so for good UI it is recommended to switch OS dark mode (DarkModePlugin will follow). For Windows users, [[switching by hotkey|https://superuser.com/a/1724237/576393]] may be useful.
 
-The plugin ''adds extra styles'' (see ~TextBoxColors and ~FewerColors sections) which are not yet configurable.
+The plugin ''adds extra styles'' (see ~FollowDarkMode and ~FewerColors sections) which are not yet configurable.
 
 The option {{{chkDarkMode}}} is now ''deprecated'': later it will be either removed or re-implemented.
 !!!Code
@@ -86,10 +86,10 @@ config.macros.darkMode = {
 	},
 	adjustCss: function(isDarkMode) {
 		if(isDarkMode) {
-			this.applySectionCSS("TextBoxColors")
+			this.applySectionCSS("FollowDarkMode")
 			this.applySectionCSS("~FewerColors")
 		} else {
-			removeStyleSheet("TextBoxColors")
+			removeStyleSheet("FollowDarkMode")
 			removeStyleSheet("~FewerColors")
 		}
 	},
@@ -164,10 +164,16 @@ config.macros.darkMode = {
 })(config.macros.darkMode)
 //}}}
 /***
-!!!TextBoxColors
+!!!FollowDarkMode
 {{{
-input, select,
-textarea { color:[[ColorPalette::Foreground]]; background-color:[[ColorPalette::Background]]; }
+input, select, textarea {
+	color:[[ColorPalette::Foreground]];
+	background-color:[[ColorPalette::Background]];
+}
+
+.darkMode {
+	color-scheme: dark;
+}
 }}}
 !!!~FewerColors
 {{{
