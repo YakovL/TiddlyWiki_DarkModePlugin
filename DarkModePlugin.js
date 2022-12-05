@@ -178,7 +178,7 @@ textarea { color:[[ColorPalette::Foreground]]; background-color:[[ColorPalette::
 }}}
 !!!DarkModeColorPalette
 Background: #000
-Foreground: #fff
+Foreground: #ddd
 ~PrimaryPale: #730
 ~PrimaryLight: #e70
 ~PrimaryMid: #fb4
