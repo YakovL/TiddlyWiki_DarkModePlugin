@@ -17,7 +17,7 @@
 Is as usual: import or copy the plugin with the {{{systemConfig}}} tag, reload. Note: for the plugin to work correctly, you should keep its name (DarkModePlugin).
 
 !!!Optional configuration
-When the dark mode is applied, the {{{darkMode}}} class is added to the {{{body}}} element. This allows to add ''styles for dark mode'' only, like this:
+When the dark mode is applied, the {{{darkMode}}} class is added to the {{{html}}} element. This allows to add ''styles for dark mode'' only, like this:
 {{{
 .darkMode code { color:red }
 code { color: green }
@@ -62,7 +62,7 @@ config.macros.darkMode = {
 		// attach the tiddler, recalc slices, invoke notifiers
 		store.saveTiddler(darkPaletteTiddler)
 
-		jQuery('body').addClass('darkMode')
+		jQuery('html').addClass('darkMode')
 		this.adjustCss(true)
 	},
 	setLight: function() {
@@ -76,7 +76,7 @@ config.macros.darkMode = {
 
 		store.deleteTiddler(this.lightPaletteTitle)
 
-		jQuery('body').removeClass('darkMode')
+		jQuery('html').removeClass('darkMode')
 		this.adjustCss(false)
 	},
 	applySectionCSS: function(sectionName) {
