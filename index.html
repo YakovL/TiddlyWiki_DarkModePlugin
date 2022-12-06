@@ -527,10 +527,10 @@ noscript {display:none;} /* Fixes a feature in Firefox 1.5.0.2 where print previ
 </div>
 <!--POST-SHADOWAREA-->
 <div id="storeArea">
-<div title="TiddlerInFilePlugin" modifier="Yakov Litvin" created="202211110931" modified="202211220813" tags="systemConfig" changecount="6">
+<div title="TiddlerInFilePlugin" modifier="Yakov Litvin" created="201808191403" modified="202212060812" tags="systemConfig" changecount="274" content-type="text/javascript">
 <pre>/***
 |Description|Allows to store any number of tiddlers as external files and more|
-|Version|1.1.1'|
+|Version|1.1.2|
 |Source|https://github.com/YakovL/TiddlyWiki_TiddlerInFilePlugin|
 |Author|Yakov Litvin|
 |License|MIT|
@@ -546,10 +546,10 @@ Here's how the macro is used:
 will store the tiddler's text in {{{MyTestTiddler.txt}}} in the same folder as TW. There's a number of other options:
 {{{
 &lt;&lt;external [[tiddler name]]
-  [file:&lt;relative path with or without filename and extension&gt;]
-  [format:{externalized | text}]
-  [keepInternal:true]
-  [plugin:true]
+	[file:&lt;relative path with or without filename and extension&gt;]
+	[format:{externalized | text}]
+	[keepInternal:true]
+	[plugin:true]
 &gt;&gt;
 }}}
 Examples of the {{{file}}} param usage:
@@ -645,7 +645,8 @@ config.macros.external = {
 		//# check if contains &quot;bad&quot; characters (like &quot; or * ..for local paths only)
 		meta.fileFormat = getParam(pParams, 'format', 'text');
 		meta.isPlugin = getFlag(pParams, 'plugin'); //# allow just &quot;plugin&quot; instead of &quot;plugin:true&quot;?
-		meta.keepInTW = getFlag(pParams, 'keepInternal'); //# ~
+		const keepInternal = getParam(pParams, 'keepInternal');
+		meta.keepInTW = !!keepInternal &amp;&amp; keepInternal !== 'false'; //# ~
 		this.registerExternal(meta);
 
 		// visual feedback
@@ -666,7 +667,7 @@ config.macros.external = {
 		var isTitle = typeof tiddlerOrTitle == &quot;string&quot;;
 		for(meta of this.tiddlersMeta)
 			if(isTitle &amp;&amp; meta.tiddlerName == tiddlerOrTitle ||
-			  !isTitle &amp;&amp; meta.tiddler == tiddlerOrTitle)
+				!isTitle &amp;&amp; meta.tiddler == tiddlerOrTitle)
 				return meta;
 	},
 	loadExternal: function(meta) {
@@ -674,9 +675,10 @@ config.macros.external = {
 //		var tiddlerText = loadFile(getLocalPath(getFullPath(meta.fileName)));
 //		onExternalTiddlerLoad(tiddlerText !== null, meta, tiddlerText);
 		// so we use async instead:
+
 		const callback = this.onExternalTiddlerLoad
 		const path = getFullPath(meta.fileName, meta.tiddlerName, this.getExtension(meta));
-		// httpReq(&quot;GET&quot;, path, this.onExternalTiddlerLoad, meta) uses default dataType,
+		// httpReq(&quot;GET&quot;, path, callback, meta) uses default dataType,
 		// which causes js to get evaluated on load. To avoid this, we customize the ajax call:
 		jQuery.ajax({
 			type: &quot;GET&quot;,
@@ -695,19 +697,20 @@ config.macros.external = {
 	},
 	onExternalTiddlerLoad: function(success, meta, responseText) {
 		if(!success) return; //# notify somehow? may fail because file is not created yet or ...
-console.log(meta)
 		const tiddler = config.macros.external.internalizeTiddler(meta, responseText);
 		store.addTiddler(tiddler);
 		//# what if tiddler already exists?
 		if(meta.isPlugin) {
-			// TODO: install like on startup
-			// a tweak for DarkModePlugin to have the tag and not confuse users
+			// make it look normally
 			tiddler.tags.push('systemConfig');
-			eval(tiddler.text);
-			// a tweak to show plugin author instead of nothing
 			const author = store.getTiddlerText(tiddler.title + &quot;::Author&quot;);
-			if(author) tiddler.creator = tiddler.modifier = author;
-			// a tweak to make DarkModePlugin's effect visible at once
+			if(author) {
+				tiddler.creator = tiddler.creator || author;
+				tiddler.modifier = tiddler.modifier || tiddler.creator;
+			}
+
+			eval(tiddler.text);
+			// for plugins introducing macros, formatters etc (may be adjusted in the future)
 			story.refreshAllTiddlers();
 		}
 		//meta.lastLoaded = responseText;
