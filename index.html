@@ -667,7 +667,7 @@ config.macros.external = {
 		var isTitle = typeof tiddlerOrTitle == &quot;string&quot;;
 		for(meta of this.tiddlersMeta)
 			if(isTitle &amp;&amp; meta.tiddlerName == tiddlerOrTitle ||
-				!isTitle &amp;&amp; meta.tiddler == tiddlerOrTitle)
+			  !isTitle &amp;&amp; meta.tiddler == tiddlerOrTitle)
 				return meta;
 	},
 	loadExternal: function(meta) {
