@@ -1,10 +1,11 @@
 /***
 |''Name''|DarkModePlugin|
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
-|''Version''|1.3.0|
-|''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
+|''Version''|1.3.0|
+|''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
+|''License''|[[MIT|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/LICENSE]]|
 !!!Demo
 <<darkMode>>
 <<darkMode label:"☀️/🌘">>
