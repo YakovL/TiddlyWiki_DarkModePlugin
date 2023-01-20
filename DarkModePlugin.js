@@ -3,7 +3,7 @@
 |''Description''|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
 |''Documentation''|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
 |''Author''|Yakov Litvin|
-|''Version''|1.3.0|
+|''Version''|1.3.1|
 |''Source''|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |''License''|[[MIT|https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/LICENSE]]|
 !!!Demo
@@ -182,7 +182,7 @@ input, select, textarea {
 	color: [[ColorPalette::PrimaryDark]];
 }
 ::selection {
-	background: [[ColorPalette::TertiaryLight]];
+	background: [[ColorPalette::TertiaryMid]];
 }
 }}}
 !!!DarkModeColorPalette
