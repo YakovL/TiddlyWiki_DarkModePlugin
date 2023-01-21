@@ -50,7 +50,7 @@ config.macros.darkMode = {
 	lightPaletteTitle: "ColorPaletteLight",
 	darkPaletteTitle: "ColorPaletteDark",
 
-	// setDark, setLight, and adjustCss are "governed outside": they don't check or change the cookie-parameter
+	// setDark, setLight, and applyAdjustments are "governed outside": they don't check or change the cookie-parameter
 	setDark: function() {
 		var paletteTitle = this.getMainPaletteTitle()
 
@@ -63,8 +63,7 @@ config.macros.darkMode = {
 		// attach the tiddler, recalc slices, invoke notifiers
 		store.saveTiddler(darkPaletteTiddler)
 
-		jQuery('html').addClass('darkMode')
-		this.adjustCss(true)
+		this.applyAdjustments(true)
 	},
 	setLight: function() {
 		var paletteTitle = this.getMainPaletteTitle()
@@ -77,19 +76,20 @@ config.macros.darkMode = {
 
 		store.deleteTiddler(this.lightPaletteTitle)
 
-		jQuery('html').removeClass('darkMode')
-		this.adjustCss(false)
+		this.applyAdjustments(false)
 	},
 	applySectionCSS: function(sectionName) {
 		var sectionText = store.getRecursiveTiddlerText(this.pluginName + "##" + sectionName, "", 1)
 		var css = sectionText.replace(/^\s*{{{((?:.|\n)*?)}}}\s*$/, "$1")
 		return setStylesheet(css, sectionName)
 	},
-	adjustCss: function(isDarkMode) {
+	applyAdjustments: function(isDarkMode) {
 		if(isDarkMode) {
+			jQuery('html').addClass('darkMode')
 			this.applySectionCSS("FollowDarkMode")
 			this.applySectionCSS("~FewerColors")
 		} else {
+			jQuery('html').removeClass('darkMode')
 			removeStyleSheet("FollowDarkMode")
 			removeStyleSheet("~FewerColors")
 		}
@@ -132,7 +132,7 @@ config.macros.darkMode = {
 		if(!this.isDarkMode()) return
 
 		// TODO: check if styles are really missing (avoid applying twice)
-		this.adjustCss(true)
+		this.applyAdjustments(true)
 		config.options[this.optionName] = true
 	},
 	handler: function(place, macroName, params, wikifier, paramString, tiddler) {
