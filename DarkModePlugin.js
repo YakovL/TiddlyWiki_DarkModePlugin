@@ -28,7 +28,7 @@ Ordinary styles are applied to both modes, but {{{.darkMode}}} ones have higher 
 The palette applied for the dark mode can be ''customized'' by editing ColorPaletteDark (removing it restores the default values).
 
 !!!Additional notes
-Styles of some browser interface bits (like <html><button class="button" onclick='alert("this is known as an alert")'>alert</button</html> are only affected by OS/browser's "dark mode"/theme, so for good UI it is recommended to switch OS dark mode (DarkModePlugin will follow). For Windows users, [[switching by hotkey|https://superuser.com/a/1724237/576393]] may be useful.
+Styles of some browser interface bits (like <html><button class="button" onclick='alert("this is known as an alert")'>alert</button</html>) are only affected by OS/browser's "dark mode"/theme, so for good UI it is recommended to switch OS dark mode (DarkModePlugin will follow). For Windows users, [[switching by hotkey|https://superuser.com/a/1724237/576393]] may be useful.
 
 The plugin ''adds extra styles'' (see ~FollowDarkMode and ~FewerColors sections) which are not yet configurable.
 
