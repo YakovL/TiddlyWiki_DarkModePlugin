@@ -2,7 +2,7 @@
 |Name       |DarkModePlugin|
 |Description|This plugin introduces "dark mode" (changes styles) and switching it by the {{{darkMode}}} macro and operating system settings|
 |Documentation|https://yakovl.github.io/TiddlyWiki_DarkModePlugin/|
-|Version    |1.3.2|
+|Version    |1.3.3|
 |Author     |Yakov Litvin|
 |Source     |https://github.com/YakovL/TiddlyWiki_DarkModePlugin/blob/master/DarkModePlugin.js|
 |License    |[[MIT|https://github.com/YakovL/TiddlyWiki_YL_ExtensionsCollection/blob/master/Common%20License%20(MIT)]]|
@@ -140,7 +140,7 @@ config.macros.darkMode = {
 		var label = getParam(pParams, "label", "switch")
 		var tooltip = ""
 
-		createTiddlyButton(place, label, tooltip, this.switchMode)
+		createTiddlyButton(place, label, tooltip, this.switchMode, 'button darkModeSwitcher')
 	}
 }
 
